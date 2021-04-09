@@ -13,7 +13,7 @@ from students st
 group by e.student_id, st.student_name, e.subject_name
 order by e.student_id, e.subject_name
 */
-
+/*
 select 
 s.student_id , s.student_name , su.subject_name,
 sum(case when e.subject_name is null then 0 else 1 end) attended_exams
@@ -25,7 +25,21 @@ left join examinations e
     on e.student_id = s.student_id 
     and su.subject_name =  e.subject_name
 
-where   (select count(*) from examinations) > 0 and (select count(*) from subjects) > 0 and (select count(student_id) from students) > 0
+where   (select count(*) from examinations) > 0 
+        and (select count(*) from subjects) > 0 
+        and (select count(student_id) from students) > 0
 
 group by s.student_id, s.student_name, su.subject_name
 order by s.student_id, su.subject_name
+
+*/
+
+select distinct st.student_id,
+       st.student_name, 
+       su.subject_name, 
+       count(ex.student_id)over(partition by st.student_id, su.subject_name) attended_exams
+from students st cross join subjects su
+     left join examinations ex
+     on ex.student_id =st.student_id
+        and ex.subject_name = su.subject_name
+order by 1, 2
